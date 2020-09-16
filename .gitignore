@@ -1,0 +1,19 @@
+
+.vs/Lab IV/v16/.suo
+*.db
+*.db-shm
+*.db-wal
+*.opendb
+*.vcxproj
+*.sln
+*.filters
+*.user
+*.exe
+*.recipe
+*.log
+*.ilk
+*.pdb
+*.tlog
+*.txt
+*.idb
+*.obj
