@@ -95,14 +95,8 @@ int main()
    cubeEdges.push_back(new EDGE(&cubeVerts[1], &cubeVerts[5]));
    cubeEdges.push_back(new EDGE(&cubeVerts[2], &cubeVerts[6]));
    cubeEdges.push_back(new EDGE(&cubeVerts[3], &cubeVerts[7]));
-   float cubePos[4][4]{
-       {1, 0, 0, 0},
-       {0, 1, 0, 0},
-       {0, 0, 1, 0},
-       {0, 0.25, 0, 1} };
    MESH* cubeMesh = new MESH(cubeEdges, &IdentityMatrix[0][0]);
-   cubeMesh->SetWorldMatrix(&cubePos[0][0]);
-   //cubeMesh->GetWorldMatrix()->Translate(0, 1, 0);
+   cubeMesh->GetWorldMatrix()->Translate(0, 0.25, 0);
 
    float cubeAngle = 0.0f;
 #pragma endregion
