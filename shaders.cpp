@@ -56,7 +56,7 @@ void ShaderUtil::VS_Project(MESH& _mesh, CAMERA* camera)
       MultVertByMatrix(_mesh.GetEdges()[i]->GetVertex(2), camera->GetViewMatrix());
 
       /* ------------- MultBy by projection matrix. ------------- */
-      // MultVertByMatrix(_mesh.GetEdges()[i]->GetVertex(1), camera->GetProjMatrix());
-      // MultVertByMatrix(_mesh.GetEdges()[i]->GetVertex(2), camera->GetProjMatrix());
+      MultVertByMatrix(_mesh.GetEdges()[i]->GetVertex(1), camera->GetProjMatrix());
+      MultVertByMatrix(_mesh.GetEdges()[i]->GetVertex(2), camera->GetProjMatrix());
    }
 }

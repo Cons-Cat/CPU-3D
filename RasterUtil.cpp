@@ -30,11 +30,10 @@ unsigned int RasterUtil::Lerp(float A, float B, float R)
 
 VECTOR_2 RasterUtil::CoordToScreen(VECTOR_3* v, RASTER* _raster)
 {
-   // float div = v->z;
-   float div = 1;
+   VECTOR_3 tempV{ v->x / v->w, v->y / v->w, v->z / v->w, 1, v->col };
    return VECTOR_2{
-       (v->x / div + 1.0f) / 2.0f * (_raster->width),
-       (1.0f - v->y / div) / 2.0f * (_raster->height),
+       (tempV.x + 1.0f) / 2.0f * (_raster->width),
+       (1.0f - tempV.y) / 2.0f * (_raster->height),
        v->col };
 }
 
@@ -50,7 +49,7 @@ unsigned int RasterUtil::ColLerp(unsigned int col1, unsigned int col2, float R)
 #pragma endregion
 
 #pragma region Lines
-void RasterUtil::BresenhamAnyDir(RASTER* _raster, int x1, int y1, int x2, int y2, unsigned int col)
+void RasterUtil::BresenhamAnyDir(RASTER* _raster, int x1, int y1, int x2, int y2, unsigned int col, unsigned int col2)
 {
    int sx = (x1 < x2) ? 1 : -1;
    int sy = (y1 < y2) ? 1 : -1;
@@ -64,11 +63,11 @@ void RasterUtil::BresenhamAnyDir(RASTER* _raster, int x1, int y1, int x2, int y2
    int leftward;
    if (x1 > x2)
    {
-      leftward = 0;
+      leftward = 1;
    }
    else if (x1 < x2)
    {
-      leftward = 1;
+      leftward = 0;
    }
    else
    {
@@ -185,8 +184,9 @@ void RasterUtil::DrawTriangle(VECTOR_3 a, VECTOR_3 b, VECTOR_3 c, RASTER* _raste
          }
       }
    }
-   BresenhamAnyDir(_raster, a.x, a.y, b.x, b.y, 0xFFFFFFFF);
-   BresenhamAnyDir(_raster, a.x, a.y, c.x, c.y, 0xFFFFFFFF);
-   BresenhamAnyDir(_raster, c.x, c.y, b.x, b.y, 0xFFFFFFFF);
+   // TODO: Re-enable these.
+   //BresenhamAnyDir(_raster, a.x, a.y, b.x, b.y, 0xFFFFFFFF);/*
+   //BresenhamAnyDir(_raster, a.x, a.y, c.x, c.y, 0xFFFFFFFF);
+   //BresenhamAnyDir(_raster, c.x, c.y, b.x, b.y, 0xFFFFFFFF);*/
 }
 #pragma endregion

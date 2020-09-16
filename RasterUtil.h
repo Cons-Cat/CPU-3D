@@ -15,5 +15,5 @@ public:
    static bool InTriangle(VECTOR_3 a, VECTOR_3 b, VECTOR_3 c, VECTOR_3 p);
    static void DrawTriangle(VECTOR_3 a, VECTOR_3 b, VECTOR_3 c, RASTER *_raster, float rad);
    static VECTOR_2 CoordToScreen(VECTOR_3 *v, RASTER *_raster);
-   static void BresenhamAnyDir(RASTER *_raster, int x1, int y1, int x2, int y2, unsigned int col);
+   static void BresenhamAnyDir(RASTER *_raster, int x1, int y1, int x2, int y2, unsigned int col, unsigned int col2);
 };
