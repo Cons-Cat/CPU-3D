@@ -3,14 +3,6 @@
 #include <stdlib.h>
 
 #pragma region Core
-void RasterUtil::ClearRaster(RASTER *_raster, unsigned int col)
-{
-   for (unsigned int i = 0; i < _raster->rasterSize; i++)
-   {
-      *(_raster->surface + i) = col;
-   }
-}
-
 unsigned int RasterUtil::ToOneDimension(unsigned int _width, unsigned int _x, unsigned int _y)
 {
    return (_width * _y) + _x;
@@ -18,9 +10,9 @@ unsigned int RasterUtil::ToOneDimension(unsigned int _width, unsigned int _x, un
 
 void RasterUtil::DrawPixel(RASTER *_raster, unsigned int _x, unsigned int _y, unsigned int col)
 {
-   if (_x < _raster->width && _y < _raster->height)
+   if (_x < _raster->GetWidth() && _y < _raster->GetHeight())
    {
-      *(_raster->surface + ToOneDimension(_raster->width, _x, _y)) = col;
+      _raster->AddToZBuffer(ToOneDimension(_raster->GetWidth(), _x, _y), col);
    }
 }
 
@@ -31,11 +23,11 @@ unsigned int RasterUtil::Lerp(float A, float B, float R)
 
 VECTOR_2 RasterUtil::CoordToScreen(VECTOR_3 *v, RASTER *_raster)
 {
-   VECTOR_3 tempV{ v->x / v->w, v->y / v->w, v->z / v->w, 1, v->col };
+   VECTOR_3 tempV{v->x / v->w, v->y / v->w, v->z / v->w, 1, v->col};
    return VECTOR_2{
-       (tempV.x + 1.0f) / 2.0f * (_raster->width),
-       (1.0f - tempV.y) / 2.0f * (_raster->height),
-       v->col };
+       (tempV.x + 1.0f) / 2.0f * (_raster->GetWidth()),
+       (1.0f - tempV.y) / 2.0f * (_raster->GetHeight()),
+       v->col};
 }
 
 unsigned int RasterUtil::ColLerp(unsigned int col1, unsigned int col2, float R)
@@ -91,7 +83,7 @@ void RasterUtil::BresenhamAnyDir(RASTER *_raster, int x1, int y1, int x2, int y2
 
    while (true)
    {
-      if (x1 >= 0 && y1 >= 0 && x1 < _raster->width && y1 < _raster->height)
+      if (x1 >= 0 && y1 >= 0 && x1 < _raster->GetWidth() && y1 < _raster->GetHeight())
       {
          DrawPixel(_raster, x, y, col);
       }
@@ -186,7 +178,7 @@ void RasterUtil::DrawTriangle(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, RASTER *_raste
       for (int j = minY; j <= maxY; j++)
       {
          VECTOR_2 IJ{
-             i, j };
+             i, j};
          if (InTriangleTwo(a, b, c, IJ))
          {
             DrawPixel(_raster, i, j, col);

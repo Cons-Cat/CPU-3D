@@ -10,24 +10,20 @@
 #pragma region Globals
 const unsigned long rasterWidth = 800;
 const unsigned long rasterHeight = 400;
-const unsigned long rasterSize = rasterWidth * rasterHeight;
-unsigned int Raster[rasterSize] = {
-    0,
-};
 float ZeroMatrix[4][4]{
     {0, 0, 0, 0},
     {0, 0, 0, 0},
     {0, 0, 0, 0},
-    {0, 0, 0, 0} };
+    {0, 0, 0, 0}};
 float IdentityMatrix[4][4]{
     {1, 0, 0, 0},
     {0, 1, 0, 0},
     {0, 0, 1, 0},
-    {0, 0, 0, 1} };
-RASTER onlyRaster{
-    &Raster[0],
-    rasterSize,
-    rasterWidth, rasterHeight };
+    {0, 0, 0, 1}};
+RASTER *onlyRaster = new RASTER(&rasterWidth, &rasterHeight);
+//  &Raster[0],
+//  rasterSize,
+//  rasterWidth, rasterHeight };
 #pragma endregion
 
 /*************
@@ -81,19 +77,19 @@ int main()
    unsigned int blue = 0xFF0000FF;
    unsigned int yellow = 0xFFFFFF00;
    // Bottom verts.
-   cubeVerts[0] = VECTOR_3{ -0.25, -0.25, -0.25, 1, green };
-   cubeVerts[1] = VECTOR_3{ 0.25, -0.25, -0.25, 1, green };
-   cubeVerts[2] = VECTOR_3{ -0.25, -0.25, 0.25, 1, green };
-   cubeVerts[3] = VECTOR_3{ 0.25, -0.25, 0.25, 1, green };
+   cubeVerts[0] = VECTOR_3{-0.25, -0.25, -0.25, 1, green};
+   cubeVerts[1] = VECTOR_3{0.25, -0.25, -0.25, 1, green};
+   cubeVerts[2] = VECTOR_3{-0.25, -0.25, 0.25, 1, green};
+   cubeVerts[3] = VECTOR_3{0.25, -0.25, 0.25, 1, green};
    cubeEdges.push_back(new EDGE(&cubeVerts[0], &cubeVerts[1]));
    cubeEdges.push_back(new EDGE(&cubeVerts[0], &cubeVerts[2]));
    cubeEdges.push_back(new EDGE(&cubeVerts[3], &cubeVerts[1]));
    cubeEdges.push_back(new EDGE(&cubeVerts[3], &cubeVerts[2]));
    // Top verts.
-   cubeVerts[4] = VECTOR_3{ -0.25, 0.25, -0.25, 1, green };
-   cubeVerts[5] = VECTOR_3{ 0.25, 0.25, -0.25, 1, green };
-   cubeVerts[6] = VECTOR_3{ -0.25, 0.25, 0.25, 1, green };
-   cubeVerts[7] = VECTOR_3{ 0.25, 0.25, 0.25, 1, green };
+   cubeVerts[4] = VECTOR_3{-0.25, 0.25, -0.25, 1, green};
+   cubeVerts[5] = VECTOR_3{0.25, 0.25, -0.25, 1, green};
+   cubeVerts[6] = VECTOR_3{-0.25, 0.25, 0.25, 1, green};
+   cubeVerts[7] = VECTOR_3{0.25, 0.25, 0.25, 1, green};
    cubeEdges.push_back(new EDGE(&cubeVerts[4], &cubeVerts[5]));
    cubeEdges.push_back(new EDGE(&cubeVerts[4], &cubeVerts[6]));
    cubeEdges.push_back(new EDGE(&cubeVerts[7], &cubeVerts[5]));
@@ -137,7 +133,8 @@ int main()
    /* ---------------------- Core Loop --------------------- */
    do
    {
-      RasterUtil::ClearRaster(&onlyRaster, 0xFF000000);
+      // RasterUtil::ClearRaster(&allRaster, 0xFF000000);
+      onlyRaster->ClearRaster(0xFF000000);
       cubeAngle += 0.165f;
       MESH *gridCopy = new MESH(*gridMesh);
       MESH *cubeCopy = new MESH(*cubeMesh);
@@ -148,11 +145,12 @@ int main()
       cubeCopy->RenderFaces(onlyRaster);
       delete gridCopy;
       delete cubeCopy;
-   } while (RS_Update(&Raster[0], rasterSize));
+   } while (RS_Update(onlyRaster->GetSurface(), onlyRaster->GetArea()));
 
    RS_Shutdown();
    delete gridMesh;
    delete cubeMesh;
    delete camera;
+   delete onlyRaster;
    return 0;
 }

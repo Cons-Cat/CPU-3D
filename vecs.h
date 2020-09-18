@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 
 struct VECTOR_2
 {
@@ -14,10 +15,23 @@ struct VECTOR_3
    unsigned int col;
 };
 
-struct RASTER
+// struct RASTER
+class RASTER
 {
+public:
+   RASTER(const unsigned long *_rasterWidth, const unsigned long *_rasterHeight);
+   void AddToZBuffer(unsigned int coord, unsigned int color);
+   void ClearZBuffer();
+   void ClearRaster(unsigned int col);
+   unsigned int *GetSurface();
+   unsigned int GetWidth();
+   unsigned int GetHeight();
+   unsigned int GetArea();
+
+private:
    unsigned int *surface;
-   const unsigned int rasterSize;
-   const unsigned int width;
-   const unsigned int height;
+   std::vector<float> *zBuffer;
+   unsigned long width;
+   unsigned long height;
+   unsigned long area;
 };

@@ -3,34 +3,34 @@
 
 class EDGE
 {
-   public:
+public:
    EDGE(EDGE &_edge);
    ~EDGE();
    EDGE(VECTOR_3 *_v1, VECTOR_3 *_v2);
    void Render(RASTER *raster);
    VECTOR_3 *GetVertex(unsigned int vert);
 
-   private:
+private:
    VECTOR_3 *v1, *v2;
 };
 
 class TRI
 {
-   public:
+public:
    TRI(TRI &_tri);
    TRI(VECTOR_3 *_v1, VECTOR_3 *_v2, VECTOR_3 *_v3, unsigned int _col);
    ~TRI();
    void Render(RASTER *raster);
    VECTOR_3 *GetVertex(unsigned int vert);
 
-   private:
+private:
    VECTOR_3 *v1, *v2, *v3;
    unsigned int col;
 };
 
 class MATRIX
 {
-   public:
+public:
    MATRIX(float *position);
    ~MATRIX();
    float *MultBy(float *position);
@@ -42,22 +42,22 @@ class MATRIX
    void SetCoord(unsigned int coord, float val);
    static void TestInvert(MATRIX *viewMatrix);
 
-   private:
+private:
    float *matrix;
    static void RotateX(MATRIX *_matrix, float rads);
    static void RotateY(MATRIX *_matrix, float rads);
    static void RotateZ(MATRIX *_matrix, float rads);
-   void (*rotMatrices[3])(MATRIX *_matrix, float ang) = { MATRIX::RotateX, MATRIX::RotateY, MATRIX::RotateZ };
+   void (*rotMatrices[3])(MATRIX *_matrix, float ang) = {MATRIX::RotateX, MATRIX::RotateY, MATRIX::RotateZ};
 };
 
 class MESH
 {
-   public:
+public:
    MESH(MESH &_mesh);
    MESH(std::vector<EDGE *> &_edges, float *position);
    ~MESH();
-   void RenderWireframe(RASTER raster);
-   void RenderFaces(RASTER raster);
+   void RenderWireframe(RASTER *raster);
+   void RenderFaces(RASTER *raster);
    MATRIX *GetWorldMatrix();
    void SetWorldMatrix(float *position);
    void MultWorldMatrix(MATRIX *_matrix);
@@ -68,7 +68,7 @@ class MESH
    std::vector<TRI *> GetTris();
    void TrisFromQuad(VECTOR_3 *_v1, VECTOR_3 *_v2, VECTOR_3 *_v3, VECTOR_3 *_v4, unsigned int col);
 
-   private:
+private:
    std::vector<EDGE *> edges;
    std::vector<TRI *> tris;
    MATRIX *localMatrix;
@@ -77,7 +77,7 @@ class MESH
 
 class CAMERA
 {
-   public:
+public:
    CAMERA();
    ~CAMERA();
    void SetAspectRatio(float width, float height);
@@ -88,7 +88,7 @@ class CAMERA
    MATRIX *GetProjMatrix();
    void Invert();
 
-   private:
+private:
    MATRIX *viewMatrix;
    MATRIX *projMatrix;
    float aspectRatio;

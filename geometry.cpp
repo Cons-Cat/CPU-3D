@@ -193,19 +193,19 @@ MESH::~MESH()
    delete worldMatrix;
 }
 
-void MESH::RenderWireframe(RASTER raster)
+void MESH::RenderWireframe(RASTER *raster)
 {
    for (unsigned int i = 0; i < edges.size(); i++)
    {
-      edges[i]->Render(&raster);
+      edges[i]->Render(raster);
    }
 }
 
-void MESH::RenderFaces(RASTER raster)
+void MESH::RenderFaces(RASTER *raster)
 {
    for (unsigned int i = 0; i < tris.size(); i++)
    {
-      tris[i]->Render(&raster);
+      tris[i]->Render(raster);
    }
 }
 
