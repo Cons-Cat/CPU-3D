@@ -8,11 +8,13 @@ unsigned int RasterUtil::ToOneDimension(unsigned int _width, unsigned int _x, un
    return (_width * _y) + _x;
 }
 
-void RasterUtil::DrawPixel(RASTER *_raster, unsigned int _x, unsigned int _y, unsigned int col)
+void RasterUtil::DrawPixel(RASTER *_raster, unsigned int _x, unsigned int _y, float _z, unsigned int col)
 {
    if (_x < _raster->GetWidth() && _y < _raster->GetHeight())
    {
-      _raster->AddToZBuffer(ToOneDimension(_raster->GetWidth(), _x, _y), col);
+      // _raster->AddToZBuffer(ToOneDimension(_raster->GetWidth(), _x, _y), col);
+      PIXEL *newPix = new PIXEL{_z, col};
+      _raster->AddToZBuffer(ToOneDimension(_raster->GetWidth(), _x, _y), newPix);
    }
 }
 
@@ -27,6 +29,7 @@ VECTOR_2 RasterUtil::CoordToScreen(VECTOR_3 *v, RASTER *_raster)
    return VECTOR_2{
        (tempV.x + 1.0f) / 2.0f * (_raster->GetWidth()),
        (1.0f - tempV.y) / 2.0f * (_raster->GetHeight()),
+       tempV.z,
        v->col};
 }
 
@@ -85,7 +88,8 @@ void RasterUtil::BresenhamAnyDir(RASTER *_raster, int x1, int y1, int x2, int y2
    {
       if (x1 >= 0 && y1 >= 0 && x1 < _raster->GetWidth() && y1 < _raster->GetHeight())
       {
-         DrawPixel(_raster, x, y, col);
+         // TODO: Proper z.
+         DrawPixel(_raster, x, y, 10, col);
       }
 
       if (((x >= x2 && leftward == 0) || (x <= x2 && leftward == 1) || (x == x2 && leftward == 2)) && ((y >= y2 && upward == 0) || (y <= y2 && upward == 1) || (y == y2 && upward == 2)))
@@ -116,7 +120,8 @@ void RasterUtil::ParametricAnyDir(RASTER *_raster, int x1, int y1, int x2, int y
       for (int i = y1; abs(i - y2) > 0; i += (y2 > y1) ? 1 : -1)
       {
          float R = abs(i - y1) / (float)abs(y2 - y1);
-         DrawPixel(_raster, x1, i, RasterUtil::ColLerp(col1, col2, R));
+         // TODO: Proper z.
+         DrawPixel(_raster, x1, i, 10, RasterUtil::ColLerp(col1, col2, R));
       }
    }
    else
@@ -125,7 +130,8 @@ void RasterUtil::ParametricAnyDir(RASTER *_raster, int x1, int y1, int x2, int y
       {
          float R = abs(i - x1) / (float)abs(x2 - x1);
          int y = Lerp(y1, y2, R);
-         DrawPixel(_raster, i, y, RasterUtil::ColLerp(col1, col2, R));
+         // TODO: Proper z.
+         DrawPixel(_raster, i, y, 10, RasterUtil::ColLerp(col1, col2, R));
       }
    }
    return;
@@ -181,7 +187,30 @@ void RasterUtil::DrawTriangle(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, RASTER *_raste
              i, j};
          if (InTriangleTwo(a, b, c, IJ))
          {
-            DrawPixel(_raster, i, j, col);
+            // TODO: Dry this up.
+            float constraintA = ImplicitLine(b, c, a);
+            float constraintB = ImplicitLine(a, c, b);
+            float constraintC = ImplicitLine(a, b, c);
+
+            float subA = ImplicitLine(b, c, IJ);
+            float subB = ImplicitLine(a, c, IJ);
+            float subC = ImplicitLine(a, b, IJ);
+
+            float barycentricA = subA / constraintA;
+            float barycentricB = subB / constraintB;
+            float barycentricC = subC / constraintC;
+
+            // float z = Lerp(a.z, b.z, );
+            float zA = barycentricA * a.z;
+            float zB = barycentricB * b.z;
+            float zC = barycentricC * c.z;
+            float zAvg = (barycentricA + barycentricB + barycentricC) / 3.0f;
+
+            // v->col |= ((unsigned int)(ImplicitLine(*b, *c, *v) / ImplicitLine(*b, *c, *a) * (float)(255)) << 16);
+            // v->col |= ((unsigned int)(ImplicitLine(*a, *c, *v) / ImplicitLine(*a, *c, *b) * (float)(255)) << 8);
+            // v->col |= ((unsigned int)(ImplicitLine(*a, *b, *v) / ImplicitLine(*a, *b, *c) * (float)(255)) << 0);
+
+            DrawPixel(_raster, i, j, zAvg, col);
          }
       }
    }

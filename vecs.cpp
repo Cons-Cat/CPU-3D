@@ -1,4 +1,5 @@
 #include "vecs.h"
+#include "RasterUtil.h"
 
 RASTER::RASTER(const unsigned long *_rasterWidth, const unsigned long *_rasterHeight)
 {
@@ -10,13 +11,12 @@ RASTER::RASTER(const unsigned long *_rasterWidth, const unsigned long *_rasterHe
    //  0,
    // };
    surface = new unsigned int[area];
+   zBuffer = new std::vector<PIXEL *>[area];
 }
 
-void RASTER::AddToZBuffer(unsigned int coord, unsigned int col, float z)
+void RASTER::AddToZBuffer(unsigned int coord, PIXEL *pixel)
 {
-   (zBuffer + coord)->push_back(col);
-   (zBuffer + coord)->push_back(z);
-   surface[coord] = col;
+   (zBuffer + coord)->push_back(pixel);
 }
 
 void RASTER::ClearZBuffer()
@@ -39,6 +39,22 @@ void RASTER::EvaluateZ()
    for (unsigned int i = 0; i < area; i++)
    {
       // *(surface + i) = col;
+      // TODO: Remove hard coded far plane Z.
+      float tempZ = 10.0f;
+      unsigned int col = 0x00000000;
+      for (unsigned int j = 0; j < (*(zBuffer + i)).size(); j++)
+      {
+         PIXEL *tempPix = (*(zBuffer + i))[j];
+
+         if (tempPix->z < tempZ)
+         {
+            col = tempPix->col;
+            tempZ = tempPix->z;
+            // TODO: Abstract memory management.
+            // delete tempPix;
+         }
+      }
+      surface[i] = col;
    }
 }
 

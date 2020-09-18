@@ -10,6 +10,7 @@
 #pragma region Globals
 const unsigned long rasterWidth = 800;
 const unsigned long rasterHeight = 400;
+RASTER *onlyRaster = new RASTER(&rasterWidth, &rasterHeight);
 float ZeroMatrix[4][4]{
     {0, 0, 0, 0},
     {0, 0, 0, 0},
@@ -20,10 +21,6 @@ float IdentityMatrix[4][4]{
     {0, 1, 0, 0},
     {0, 0, 1, 0},
     {0, 0, 0, 1}};
-RASTER *onlyRaster = new RASTER(&rasterWidth, &rasterHeight);
-//  &Raster[0],
-//  rasterSize,
-//  rasterWidth, rasterHeight };
 #pragma endregion
 
 /*************
@@ -133,18 +130,18 @@ int main()
    /* ---------------------- Core Loop --------------------- */
    do
    {
-      // RasterUtil::ClearRaster(&allRaster, 0xFF000000);
       onlyRaster->ClearRaster(0xFF000000);
       cubeAngle += 0.165f;
-      MESH *gridCopy = new MESH(*gridMesh);
+      // MESH *gridCopy = new MESH(*gridMesh);
       MESH *cubeCopy = new MESH(*cubeMesh);
-      cubeCopy->GetLocalMatrix()->DRotate(1, cubeAngle);
-      ShaderUtil::VS_ProjectEdges(*gridCopy, camera);
+      // cubeCopy->GetLocalMatrix()->DRotate(1, cubeAngle);
+      // ShaderUtil::VS_ProjectEdges(*gridCopy, camera);
       ShaderUtil::VS_ProjectFaces(*cubeCopy, camera);
-      gridCopy->RenderWireframe(onlyRaster);
+      // gridCopy->RenderWireframe(onlyRaster);
       cubeCopy->RenderFaces(onlyRaster);
-      delete gridCopy;
+      // delete gridCopy;
       delete cubeCopy;
+      onlyRaster->EvaluateZ();
    } while (RS_Update(onlyRaster->GetSurface(), onlyRaster->GetArea()));
 
    RS_Shutdown();
