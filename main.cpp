@@ -8,7 +8,7 @@
 
 /* ----------------------- Globals ---------------------- */
 #pragma region Globals
-const unsigned long rasterWidth = 400;
+const unsigned long rasterWidth = 800;
 const unsigned long rasterHeight = 400;
 const unsigned long rasterSize = rasterWidth * rasterHeight;
 unsigned int Raster[rasterSize] = {
@@ -18,16 +18,16 @@ float ZeroMatrix[4][4]{
     {0, 0, 0, 0},
     {0, 0, 0, 0},
     {0, 0, 0, 0},
-    {0, 0, 0, 0}};
+    {0, 0, 0, 0} };
 float IdentityMatrix[4][4]{
     {1, 0, 0, 0},
     {0, 1, 0, 0},
     {0, 0, 1, 0},
-    {0, 0, 0, 1}};
+    {0, 0, 0, 1} };
 RASTER onlyRaster{
     &Raster[0],
     rasterSize,
-    rasterWidth, rasterHeight};
+    rasterWidth, rasterHeight };
 #pragma endregion
 
 /*************
@@ -76,21 +76,24 @@ int main()
 #pragma region Cube
    VECTOR_3 cubeVerts[8];
    std::vector<EDGE *> cubeEdges;
+   unsigned int red = 0xFFFF0000;
    unsigned int green = 0xFF00FF00;
+   unsigned int blue = 0xFF0000FF;
+   unsigned int yellow = 0xFFFFFF00;
    // Bottom verts.
-   cubeVerts[0] = VECTOR_3{-0.25, -0.25, -0.25, 1, green};
-   cubeVerts[1] = VECTOR_3{0.25, -0.25, -0.25, 1, green};
-   cubeVerts[2] = VECTOR_3{-0.25, -0.25, 0.25, 1, green};
-   cubeVerts[3] = VECTOR_3{0.25, -0.25, 0.25, 1, green};
+   cubeVerts[0] = VECTOR_3{ -0.25, -0.25, -0.25, 1, green };
+   cubeVerts[1] = VECTOR_3{ 0.25, -0.25, -0.25, 1, green };
+   cubeVerts[2] = VECTOR_3{ -0.25, -0.25, 0.25, 1, green };
+   cubeVerts[3] = VECTOR_3{ 0.25, -0.25, 0.25, 1, green };
    cubeEdges.push_back(new EDGE(&cubeVerts[0], &cubeVerts[1]));
    cubeEdges.push_back(new EDGE(&cubeVerts[0], &cubeVerts[2]));
    cubeEdges.push_back(new EDGE(&cubeVerts[3], &cubeVerts[1]));
    cubeEdges.push_back(new EDGE(&cubeVerts[3], &cubeVerts[2]));
    // Top verts.
-   cubeVerts[4] = VECTOR_3{-0.25, 0.25, -0.25, 1, green};
-   cubeVerts[5] = VECTOR_3{0.25, 0.25, -0.25, 1, green};
-   cubeVerts[6] = VECTOR_3{-0.25, 0.25, 0.25, 1, green};
-   cubeVerts[7] = VECTOR_3{0.25, 0.25, 0.25, 1, green};
+   cubeVerts[4] = VECTOR_3{ -0.25, 0.25, -0.25, 1, green };
+   cubeVerts[5] = VECTOR_3{ 0.25, 0.25, -0.25, 1, green };
+   cubeVerts[6] = VECTOR_3{ -0.25, 0.25, 0.25, 1, green };
+   cubeVerts[7] = VECTOR_3{ 0.25, 0.25, 0.25, 1, green };
    cubeEdges.push_back(new EDGE(&cubeVerts[4], &cubeVerts[5]));
    cubeEdges.push_back(new EDGE(&cubeVerts[4], &cubeVerts[6]));
    cubeEdges.push_back(new EDGE(&cubeVerts[7], &cubeVerts[5]));
@@ -100,8 +103,21 @@ int main()
    cubeEdges.push_back(new EDGE(&cubeVerts[1], &cubeVerts[5]));
    cubeEdges.push_back(new EDGE(&cubeVerts[2], &cubeVerts[6]));
    cubeEdges.push_back(new EDGE(&cubeVerts[3], &cubeVerts[7]));
+   // Compose mesh.
    MESH *cubeMesh = new MESH(cubeEdges, &IdentityMatrix[0][0]);
    cubeMesh->GetWorldMatrix()->Translate(0, 0.25, 0);
+   // Back quad.
+   cubeMesh->TrisFromQuad(&cubeVerts[4], &cubeVerts[5], &cubeVerts[0], &cubeVerts[1], green);
+   // Front quad.
+   cubeMesh->TrisFromQuad(&cubeVerts[3], &cubeVerts[2], &cubeVerts[6], &cubeVerts[7], green);
+   // Right quad.
+   cubeMesh->TrisFromQuad(&cubeVerts[5], &cubeVerts[7], &cubeVerts[1], &cubeVerts[3], red);
+   // Left quad.
+   cubeMesh->TrisFromQuad(&cubeVerts[4], &cubeVerts[6], &cubeVerts[0], &cubeVerts[2], blue);
+   // Bottom quad.
+   cubeMesh->TrisFromQuad(&cubeVerts[0], &cubeVerts[1], &cubeVerts[2], &cubeVerts[3], yellow);
+   // Top quad.
+   cubeMesh->TrisFromQuad(&cubeVerts[4], &cubeVerts[5], &cubeVerts[6], &cubeVerts[7], yellow);
 
    float cubeAngle = 0.0f;
 #pragma endregion
@@ -122,14 +138,14 @@ int main()
    do
    {
       RasterUtil::ClearRaster(&onlyRaster, 0xFF000000);
-      cubeAngle += 0.065f;
+      cubeAngle += 0.165f;
       MESH *gridCopy = new MESH(*gridMesh);
       MESH *cubeCopy = new MESH(*cubeMesh);
       cubeCopy->GetLocalMatrix()->DRotate(1, cubeAngle);
-      ShaderUtil::VS_Project(*gridCopy, camera);
-      ShaderUtil::VS_Project(*cubeCopy, camera);
-      gridCopy->Render(onlyRaster);
-      cubeCopy->Render(onlyRaster);
+      ShaderUtil::VS_ProjectEdges(*gridCopy, camera);
+      ShaderUtil::VS_ProjectFaces(*cubeCopy, camera);
+      gridCopy->RenderWireframe(onlyRaster);
+      cubeCopy->RenderFaces(onlyRaster);
       delete gridCopy;
       delete cubeCopy;
    } while (RS_Update(&Raster[0], rasterSize));

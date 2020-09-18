@@ -20,15 +20,15 @@ void ShaderUtil::PS_Color(VECTOR_2* v, VECTOR_2* a, VECTOR_2* b, VECTOR_2* c)
 }
 */
 
-void ShaderUtil::VS_Rotate(MATRIX& _matrix, unsigned int axis, float degrees)
+void ShaderUtil::VS_Rotate(MATRIX &_matrix, unsigned int axis, float degrees)
 {
    _matrix.DRotate(axis, degrees);
 }
 
-void ShaderUtil::MultVertByMatrix(VECTOR_3* vec, MATRIX* matrix)
+void ShaderUtil::MultVertByMatrix(VECTOR_3 *vec, MATRIX *matrix)
 {
    VECTOR_3 tempVec{ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-   float* vals = matrix->GetMatrix();
+   float *vals = matrix->GetMatrix();
    tempVec.x = vec->x * vals[0] + vec->y * vals[4] + vec->z * vals[8] + vec->w * vals[12];
    tempVec.y = vec->x * vals[1] + vec->y * vals[5] + vec->z * vals[9] + vec->w * vals[13];
    tempVec.z = vec->x * vals[2] + vec->y * vals[6] + vec->z * vals[10] + vec->w * vals[14];
@@ -39,7 +39,7 @@ void ShaderUtil::MultVertByMatrix(VECTOR_3* vec, MATRIX* matrix)
    vec->w = tempVec.w;
 }
 
-void ShaderUtil::VS_Project(MESH& _mesh, CAMERA* camera)
+void ShaderUtil::VS_ProjectEdges(MESH &_mesh, CAMERA *camera)
 {
    for (unsigned int i = 0; i < _mesh.GetEdges().size(); i++)
    {
@@ -58,5 +58,31 @@ void ShaderUtil::VS_Project(MESH& _mesh, CAMERA* camera)
       /* ------------- MultBy by projection matrix. ------------- */
       MultVertByMatrix(_mesh.GetEdges()[i]->GetVertex(1), camera->GetProjMatrix());
       MultVertByMatrix(_mesh.GetEdges()[i]->GetVertex(2), camera->GetProjMatrix());
+   }
+}
+
+void ShaderUtil::VS_ProjectFaces(MESH &_mesh, CAMERA *camera)
+{
+   for (unsigned int i = 0; i < _mesh.GetTris().size(); i++)
+   {
+      /* ---------------- MultBy by local matrix. --------------- */
+      MultVertByMatrix(_mesh.GetTris()[i]->GetVertex(1), _mesh.GetLocalMatrix());
+      MultVertByMatrix(_mesh.GetTris()[i]->GetVertex(2), _mesh.GetLocalMatrix());
+      MultVertByMatrix(_mesh.GetTris()[i]->GetVertex(3), _mesh.GetLocalMatrix());
+
+      /* ---------------- MultBy by world matrix. --------------- */
+      MultVertByMatrix(_mesh.GetTris()[i]->GetVertex(1), _mesh.GetWorldMatrix());
+      MultVertByMatrix(_mesh.GetTris()[i]->GetVertex(2), _mesh.GetWorldMatrix());
+      MultVertByMatrix(_mesh.GetTris()[i]->GetVertex(3), _mesh.GetWorldMatrix());
+
+      /* ---------------- MultBy by view matrix. ---------------- */
+      MultVertByMatrix(_mesh.GetTris()[i]->GetVertex(1), camera->GetViewMatrix());
+      MultVertByMatrix(_mesh.GetTris()[i]->GetVertex(2), camera->GetViewMatrix());
+      MultVertByMatrix(_mesh.GetTris()[i]->GetVertex(3), camera->GetViewMatrix());
+
+      /* ------------- MultBy by projection matrix. ------------- */
+      MultVertByMatrix(_mesh.GetTris()[i]->GetVertex(1), camera->GetProjMatrix());
+      MultVertByMatrix(_mesh.GetTris()[i]->GetVertex(2), camera->GetProjMatrix());
+      MultVertByMatrix(_mesh.GetTris()[i]->GetVertex(3), camera->GetProjMatrix());
    }
 }

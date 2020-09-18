@@ -1,8 +1,9 @@
 #include "RasterUtil.h"
+#include <algorithm>
 #include <stdlib.h>
 
 #pragma region Core
-void RasterUtil::ClearRaster(RASTER* _raster, unsigned int col)
+void RasterUtil::ClearRaster(RASTER *_raster, unsigned int col)
 {
    for (unsigned int i = 0; i < _raster->rasterSize; i++)
    {
@@ -15,7 +16,7 @@ unsigned int RasterUtil::ToOneDimension(unsigned int _width, unsigned int _x, un
    return (_width * _y) + _x;
 }
 
-void RasterUtil::DrawPixel(RASTER* _raster, unsigned int _x, unsigned int _y, unsigned int col)
+void RasterUtil::DrawPixel(RASTER *_raster, unsigned int _x, unsigned int _y, unsigned int col)
 {
    if (_x < _raster->width && _y < _raster->height)
    {
@@ -28,7 +29,7 @@ unsigned int RasterUtil::Lerp(float A, float B, float R)
    return (B - A) * R + A;
 }
 
-VECTOR_2 RasterUtil::CoordToScreen(VECTOR_3* v, RASTER* _raster)
+VECTOR_2 RasterUtil::CoordToScreen(VECTOR_3 *v, RASTER *_raster)
 {
    VECTOR_3 tempV{ v->x / v->w, v->y / v->w, v->z / v->w, 1, v->col };
    return VECTOR_2{
@@ -49,7 +50,7 @@ unsigned int RasterUtil::ColLerp(unsigned int col1, unsigned int col2, float R)
 #pragma endregion
 
 #pragma region Lines
-void RasterUtil::BresenhamAnyDir(RASTER* _raster, int x1, int y1, int x2, int y2, unsigned int col, unsigned int col2)
+void RasterUtil::BresenhamAnyDir(RASTER *_raster, int x1, int y1, int x2, int y2, unsigned int col, unsigned int col2)
 {
    int sx = (x1 < x2) ? 1 : -1;
    int sy = (y1 < y2) ? 1 : -1;
@@ -116,7 +117,7 @@ void RasterUtil::BresenhamAnyDir(RASTER* _raster, int x1, int y1, int x2, int y2
    }
 }
 
-void RasterUtil::ParametricAnyDir(RASTER* _raster, int x1, int y1, int x2, int y2, unsigned int col1, unsigned int col2)
+void RasterUtil::ParametricAnyDir(RASTER *_raster, int x1, int y1, int x2, int y2, unsigned int col1, unsigned int col2)
 {
    if (x1 == x2)
    {
@@ -140,13 +141,24 @@ void RasterUtil::ParametricAnyDir(RASTER* _raster, int x1, int y1, int x2, int y
 #pragma endregion
 
 #pragma region Triangles
-float RasterUtil::ImplicitLine(VECTOR_3 a, VECTOR_3 b, VECTOR_3 p)
+float RasterUtil::ImplicitLine(VECTOR_2 a, VECTOR_2 b, VECTOR_2 p)
 {
    return (a.y - b.y) * p.x + (b.x - a.x) * p.y + a.x * b.y - a.y * b.x;
 }
 
-VECTOR_3 RasterUtil::RasterUtil::FindBarycentric(VECTOR_3 a, VECTOR_3 b, VECTOR_3 c, VECTOR_3 p)
+// VECTOR_3 RasterUtil::FindBarycentric(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, VECTOR_2 p)
+// {
+// }
+
+// bool RasterUtil::InTriangleThree(VECTOR_3 a, VECTOR_3 b, VECTOR_3 c, VECTOR_3 p)
+// {
+//    VECTOR_3 v1 = FindBarycentric(a, b, c, p);
+//    return v1.x <= 1 && v1.y <= 1 && v1.z <= 1 && v1.x >= 0 && v1.y >= 0 && v1.z >= 0;
+// }
+
+bool RasterUtil::InTriangleTwo(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, VECTOR_2 p)
 {
+   // Find barycentric coordinates.
    float constraintA = ImplicitLine(b, c, a);
    float constraintB = ImplicitLine(a, c, b);
    float constraintC = ImplicitLine(a, b, c);
@@ -155,38 +167,31 @@ VECTOR_3 RasterUtil::RasterUtil::FindBarycentric(VECTOR_3 a, VECTOR_3 b, VECTOR_
    float subB = ImplicitLine(a, c, p);
    float subC = ImplicitLine(a, b, p);
 
-   return {
-       subA / constraintA, subB / constraintB, subC / constraintC };
+   float barycentricA = subA / constraintA;
+   float barycentricB = subB / constraintB;
+   float barycentricC = subC / constraintC;
+
+   return barycentricA <= 1 && barycentricB <= 1 && barycentricC <= 1 && barycentricA >= 0 && barycentricB >= 0 && barycentricC >= 0;
 }
 
-bool RasterUtil::InTriangle(VECTOR_3 a, VECTOR_3 b, VECTOR_3 c, VECTOR_3 p)
+void RasterUtil::DrawTriangle(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, RASTER *_raster, unsigned int col)
 {
-   VECTOR_3 v1 = FindBarycentric(a, b, c, p);
-   return v1.x <= 1 && v1.y <= 1 && v1.z <= 1 && v1.x >= 0 && v1.y >= 0 && v1.z >= 0;
-}
+   unsigned int minX = std::min(a.x, std::min(b.x, c.x));
+   unsigned int maxX = std::max(a.x, std::max(b.x, c.x));
+   unsigned int minY = std::min(a.y, std::min(b.y, c.y));
+   unsigned int maxY = std::max(a.y, std::max(b.y, c.y));
 
-void RasterUtil::DrawTriangle(VECTOR_3 a, VECTOR_3 b, VECTOR_3 c, RASTER* _raster, float rad)
-{
-   // shader->VS_Rotate(&a, &b, &c, shader, rad);
-   CoordToScreen(&a, _raster);
-   CoordToScreen(&b, _raster);
-   CoordToScreen(&c, _raster);
-   for (int i = 0; i < _raster->width; i++)
+   for (int i = minX; i <= maxX; i++)
    {
-      for (int j = 0; j < _raster->height; j++)
+      for (int j = minY; j <= maxY; j++)
       {
-         VECTOR_3 IJ{
-             i, j, 0xFF000000 };
-         if (InTriangle(a, b, c, IJ))
+         VECTOR_2 IJ{
+             i, j };
+         if (InTriangleTwo(a, b, c, IJ))
          {
-            // shader->PS_Color(&IJ, &a, &b, &c);
-            DrawPixel(_raster, i, j, IJ.col);
+            DrawPixel(_raster, i, j, col);
          }
       }
    }
-   // TODO: Re-enable these.
-   //BresenhamAnyDir(_raster, a.x, a.y, b.x, b.y, 0xFFFFFFFF);/*
-   //BresenhamAnyDir(_raster, a.x, a.y, c.x, c.y, 0xFFFFFFFF);
-   //BresenhamAnyDir(_raster, c.x, c.y, b.x, b.y, 0xFFFFFFFF);*/
 }
 #pragma endregion

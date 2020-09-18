@@ -7,7 +7,7 @@
 #include <vector>
 
 #pragma region Edge
-EDGE::EDGE(EDGE& _edge)
+EDGE::EDGE(EDGE &_edge)
 {
    v1 = new VECTOR_3();
    v2 = new VECTOR_3();
@@ -15,7 +15,7 @@ EDGE::EDGE(EDGE& _edge)
    *v2 = *(_edge.v2);
 }
 
-EDGE::EDGE(VECTOR_3* _v1, VECTOR_3* _v2)
+EDGE::EDGE(VECTOR_3 *_v1, VECTOR_3 *_v2)
 {
    v1 = _v1;
    v2 = _v2;
@@ -27,23 +27,23 @@ EDGE::~EDGE()
    delete v2;
 }
 
-void EDGE::Render(RASTER* raster)
+void EDGE::Render(RASTER *raster)
 {
-   VECTOR_2* t1 = &RasterUtil::CoordToScreen(v1, raster);
-   VECTOR_2* t2 = &RasterUtil::CoordToScreen(v2, raster);
+   VECTOR_2 *t1 = &RasterUtil::CoordToScreen(v1, raster);
+   VECTOR_2 *t2 = &RasterUtil::CoordToScreen(v2, raster);
    // RasterUtil::ParametricAnyDir(raster, t1->x, t1->y, t2->x, t2->y, t1->col, t2->col);
    RasterUtil::BresenhamAnyDir(raster, t1->x, t1->y, t2->x, t2->y, t1->col, t2->col);
    // RasterUtil::ParametricAnyDir(raster, t1->x, t1->y, t2->x, t2->y, t1->col, t2->col);
 }
 
-VECTOR_3* EDGE::GetVertex(unsigned int vert)
+VECTOR_3 *EDGE::GetVertex(unsigned int vert)
 {
    return vert == 1 ? v1 : v2;
 }
 #pragma endregion
 
 #pragma region Matrix
-MATRIX::MATRIX(float* position)
+MATRIX::MATRIX(float *position)
 {
    matrix = new float[16];
    Pos(position);
@@ -54,9 +54,9 @@ MATRIX::~MATRIX()
    delete matrix;
 }
 
-float* MATRIX::MultBy(float* position)
+float *MATRIX::MultBy(float *position)
 {
-   float* arr = new float[16];
+   float *arr = new float[16];
    for (unsigned int i = 0; i < 16; i++)
    {
       *(arr + i) = 0;
@@ -74,7 +74,7 @@ float* MATRIX::MultBy(float* position)
    return &arr[0];
 }
 
-void MATRIX::Pos(float* position)
+void MATRIX::Pos(float *position)
 {
    for (unsigned int i = 0; i < 16; i++)
    {
@@ -82,41 +82,41 @@ void MATRIX::Pos(float* position)
    }
 }
 
-float* MATRIX::GetMatrix()
+float *MATRIX::GetMatrix()
 {
    return matrix;
 }
 
-void MATRIX::RotateX(MATRIX* _matrix, float rads)
+void MATRIX::RotateX(MATRIX *_matrix, float rads)
 {
    float arr[4][4] = {
        {1, 0, 0, 0},
        {0, cos(rads), -sin(rads), 0},
        {0, sin(rads), cos(rads), 0},
        {0, 0, 0, 1} };
-   float* temp = _matrix->MultBy(&arr[0][0]);
+   float *temp = _matrix->MultBy(&arr[0][0]);
    _matrix->Pos(temp);
 }
 
-void MATRIX::RotateY(MATRIX* _matrix, float rads)
+void MATRIX::RotateY(MATRIX *_matrix, float rads)
 {
    float arr[4][4] = {
        {cos(rads), 0, sin(rads), 0},
        {0, 1, 0, 0},
        {-sin(rads), 0, cos(rads), 0},
        {0, 0, 0, 1} };
-   float* temp = _matrix->MultBy(&arr[0][0]);
+   float *temp = _matrix->MultBy(&arr[0][0]);
    _matrix->Pos(temp);
 }
 
-void MATRIX::RotateZ(MATRIX* _matrix, float rads)
+void MATRIX::RotateZ(MATRIX *_matrix, float rads)
 {
    float arr[4][4] = {
        {cos(rads), -sin(rads), 0, 0},
        {sin(rads), cos(rads), 0, 0},
        {0, 0, 1, 0},
        {0, 0, 0, 1} };
-   float* temp = _matrix->MultBy(&arr[0][0]);
+   float *temp = _matrix->MultBy(&arr[0][0]);
    _matrix->Pos(temp);
 }
 
@@ -128,14 +128,10 @@ void MATRIX::DRotate(unsigned int axis, float degrees)
 void MATRIX::Translate(float xOff, float yOff, float zOff)
 {
    float arr[4][4]{
-      //  {1, 0, 0, xOff},
-      //  {0, 1, 0, yOff},
-      //  {0, 0, 1, zOff},
-      //  {0, 0, 0, 1}};
-    {1, 0, 0, 0},
-    {0, 1, 0, 0},
-    {0, 0, 1, 0},
-    {xOff, yOff, zOff, 1} };
+       {1, 0, 0, 0},
+       {0, 1, 0, 0},
+       {0, 0, 1, 0},
+       {xOff, yOff, zOff, 1} };
    Pos(MultBy(&arr[0][0]));
 }
 
@@ -154,7 +150,7 @@ void MATRIX::SetCoord(unsigned int coord, float val)
 #pragma endregion
 
 #pragma region Mesh
-MESH::MESH(MESH& _mesh)
+MESH::MESH(MESH &_mesh)
 {
    float IdentityMatrix[4][4]{
        {1, 0, 0, 0},
@@ -167,11 +163,15 @@ MESH::MESH(MESH& _mesh)
    {
       edges.push_back(new EDGE(*(_mesh.edges[i])));
    }
+   for (unsigned int i = 0; i < _mesh.tris.size(); i++)
+   {
+      tris.push_back(new TRI(*(_mesh.tris[i])));
+   }
    SetLocalMatrix(_mesh.GetLocalMatrix()->GetMatrix());
    SetWorldMatrix(_mesh.GetWorldMatrix()->GetMatrix());
 }
 
-MESH::MESH(std::vector<EDGE*>& _edges, float* position)
+MESH::MESH(std::vector<EDGE *> &_edges, float *position)
 {
    edges = _edges;
    float IdentityMatrix[4][4]{
@@ -193,7 +193,7 @@ MESH::~MESH()
    delete worldMatrix;
 }
 
-void MESH::Render(RASTER raster)
+void MESH::RenderWireframe(RASTER raster)
 {
    for (unsigned int i = 0; i < edges.size(); i++)
    {
@@ -201,39 +201,61 @@ void MESH::Render(RASTER raster)
    }
 }
 
-void MESH::MultLocalMatrix(MATRIX* _matrix)
+void MESH::RenderFaces(RASTER raster)
+{
+   for (unsigned int i = 0; i < tris.size(); i++)
+   {
+      tris[i]->Render(&raster);
+   }
+}
+
+void MESH::MultLocalMatrix(MATRIX *_matrix)
 {
    localMatrix->MultBy(_matrix->GetMatrix());
 }
 
-void MESH::SetLocalMatrix(float* position)
+void MESH::SetLocalMatrix(float *position)
 {
    localMatrix->Pos(position);
 }
 
-void MESH::SetWorldMatrix(float* position)
+void MESH::SetWorldMatrix(float *position)
 {
    worldMatrix->Pos(position);
 }
 
-void MESH::MultWorldMatrix(MATRIX* _matrix)
+void MESH::MultWorldMatrix(MATRIX *_matrix)
 {
    worldMatrix->MultBy(_matrix->GetMatrix());
 }
 
-MATRIX* MESH::GetWorldMatrix()
+MATRIX *MESH::GetWorldMatrix()
 {
    return worldMatrix;
 }
 
-MATRIX* MESH::GetLocalMatrix()
+MATRIX *MESH::GetLocalMatrix()
 {
    return localMatrix;
 }
 
-std::vector<EDGE*> MESH::GetEdges()
+std::vector<EDGE *> MESH::GetEdges()
 {
    return edges;
+}
+
+std::vector<TRI *> MESH::GetTris()
+{
+   return tris;
+}
+
+void MESH::TrisFromQuad(VECTOR_3 *_v1, VECTOR_3 *_v2, VECTOR_3 *_v3, VECTOR_3 *_v4, unsigned int col)
+{
+   // _v1 and _v4 represent non-adjacent vertices.
+   TRI *tri1 = new TRI(_v1, _v2, _v3, col);
+   TRI *tri2 = new TRI(_v2, _v3, _v4, col);
+   tris.push_back(tri1);
+   tris.push_back(tri2);
 }
 #pragma endregion
 
@@ -265,12 +287,12 @@ void CAMERA::SetFOV(float degrees)
    vFOV = degrees;
 }
 
-void CAMERA::SetViewMatrix(float* position)
+void CAMERA::SetViewMatrix(float *position)
 {
    viewMatrix = new MATRIX(position);
 }
 
-MATRIX* CAMERA::GetViewMatrix()
+MATRIX *CAMERA::GetViewMatrix()
 {
    return viewMatrix;
 }
@@ -289,7 +311,7 @@ void CAMERA::SetProjMatrix(float zNear, float zFar)
    projMatrix->Pos(&projMat[0][0]);
 }
 
-MATRIX* CAMERA::GetProjMatrix()
+MATRIX *CAMERA::GetProjMatrix()
 {
    return projMatrix;
 }
@@ -316,7 +338,7 @@ void CAMERA::Invert()
          transMatrix[i][j] = subMatrix[j][i];
       }
    }
-   MATRIX* tempMatrix = new MATRIX(&transMatrix[0][0]);
+   MATRIX *tempMatrix = new MATRIX(&transMatrix[0][0]);
    ShaderUtil::MultVertByMatrix(&tempVert, tempMatrix);
    // Negate the vector.
    tempVert.x = -tempVert.x;
@@ -326,5 +348,54 @@ void CAMERA::Invert()
    tempMatrix->SetCoord(1, tempVert.y);
    tempMatrix->SetCoord(2, tempVert.z);
    viewMatrix = tempMatrix;
+}
+#pragma endregion
+
+#pragma region Triangle
+TRI::TRI(VECTOR_3 *_v1, VECTOR_3 *_v2, VECTOR_3 *_v3, unsigned int _col)
+{
+   v1 = _v1;
+   v2 = _v2;
+   v3 = _v3;
+   col = _col;
+}
+
+TRI::TRI(TRI &_tri)
+{
+   v1 = new VECTOR_3();
+   v2 = new VECTOR_3();
+   v3 = new VECTOR_3();
+   *v1 = *(_tri.v1);
+   *v2 = *(_tri.v2);
+   *v3 = *(_tri.v3);
+   col = _tri.col;
+}
+
+TRI::~TRI()
+{
+}
+
+void TRI::Render(RASTER *raster)
+{
+   VECTOR_2 a = RasterUtil::CoordToScreen(v1, raster);
+   VECTOR_2 b = RasterUtil::CoordToScreen(v2, raster);
+   VECTOR_2 c = RasterUtil::CoordToScreen(v3, raster);
+   RasterUtil::DrawTriangle(a, b, c, raster, col);
+}
+
+VECTOR_3 *TRI::GetVertex(unsigned int vert)
+{
+   if (vert == 1)
+   {
+      return v1;
+   }
+   if (vert == 2)
+   {
+      return v2;
+   }
+   if (vert == 3)
+   {
+      return v3;
+   }
 }
 #pragma endregion

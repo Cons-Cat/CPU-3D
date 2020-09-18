@@ -17,3 +17,12 @@
 *.txt
 *.idb
 *.obj
+
+/main.cpp
+main.cpp
+*.jpg
+main.cpp
+*.json
+*.sarif
+*.xml
+.vs/src/v16/.suo
