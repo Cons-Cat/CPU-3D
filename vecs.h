@@ -15,14 +15,21 @@ struct VECTOR_3
    unsigned int col;
 };
 
+struct PIXEL{
+   unsigned int x, y;
+   float z;
+   unsigned int col;
+};
+
 // struct RASTER
 class RASTER
 {
 public:
    RASTER(const unsigned long *_rasterWidth, const unsigned long *_rasterHeight);
-   void AddToZBuffer(unsigned int coord, unsigned int color);
+   void AddToZBuffer(unsigned int coord, unsigned int col, float z);
    void ClearZBuffer();
    void ClearRaster(unsigned int col);
+   void EvaluateZ();
    unsigned int *GetSurface();
    unsigned int GetWidth();
    unsigned int GetHeight();

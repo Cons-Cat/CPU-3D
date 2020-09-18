@@ -1,6 +1,6 @@
 #include "vecs.h"
 
-RASTER::RASTER::RASTER(const unsigned long *_rasterWidth, const unsigned long *_rasterHeight)
+RASTER::RASTER(const unsigned long *_rasterWidth, const unsigned long *_rasterHeight)
 {
    width = *_rasterWidth;
    height = *_rasterHeight;
@@ -12,16 +12,19 @@ RASTER::RASTER::RASTER(const unsigned long *_rasterWidth, const unsigned long *_
    surface = new unsigned int[area];
 }
 
-void RASTER::RASTER::AddToZBuffer(unsigned int coord, unsigned int color)
+void RASTER::AddToZBuffer(unsigned int coord, unsigned int col, float z)
 {
+   (zBuffer + coord)->push_back(col);
+   (zBuffer + coord)->push_back(z);
+   surface[coord] = col;
 }
 
-void RASTER::RASTER::ClearZBuffer()
+void RASTER::ClearZBuffer()
 {
    // delete zBuffer;
 }
 
-void RASTER::RASTER::ClearRaster(unsigned int col)
+void RASTER::ClearRaster(unsigned int col)
 {
    {
       for (unsigned int i = 0; i < area; i++)
@@ -31,22 +34,30 @@ void RASTER::RASTER::ClearRaster(unsigned int col)
    }
 }
 
-unsigned int *RASTER::RASTER::GetSurface()
+void RASTER::EvaluateZ()
+{
+   for (unsigned int i = 0; i < area; i++)
+   {
+      // *(surface + i) = col;
+   }
+}
+
+unsigned int *RASTER::GetSurface()
 {
    return surface;
 }
 
-unsigned int RASTER::RASTER::GetWidth()
+unsigned int RASTER::GetWidth()
 {
    return width;
 }
 
-unsigned int RASTER::RASTER::GetHeight()
+unsigned int RASTER::GetHeight()
 {
    return height;
 }
 
-unsigned int RASTER::RASTER::GetArea()
+unsigned int RASTER::GetArea()
 {
    return area;
 }
