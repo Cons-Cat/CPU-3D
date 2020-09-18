@@ -24,13 +24,11 @@ struct PIXEL
    unsigned int col;
 };
 
-// struct RASTER
 class RASTER
 {
    public:
    RASTER(const unsigned long* _rasterWidth, const unsigned long* _rasterHeight);
    void AddToZBuffer(unsigned int coord, PIXEL* pixel);
-   void ClearZBuffer();
    void ClearRaster(unsigned int col);
    void EvaluateZ(CAMERA* camera);
    void CleanZ();

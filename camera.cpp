@@ -1,7 +1,4 @@
 #include "camera.h"
-//#include "matrix.fwd.h"
-//#include "vecs.h"
-//#include "geometry.h"
 
 CAMERA::CAMERA()
 {
@@ -46,7 +43,7 @@ void CAMERA::SetProjMatrix(float zNear, float zFar)
    float yScale = 1.0f / tan(rad / 2);
    float xScale = yScale * aspectRatio;
    nearPlane = zNear;
-   nearPlane = zFar;
+   farPlane = zFar;
 
    float projMat[4][4]{
        {yScale * aspectRatio, 0, 0, 0},

@@ -5,10 +5,6 @@ RASTER::RASTER(const unsigned long *_rasterWidth, const unsigned long *_rasterHe
    width = *_rasterWidth;
    height = *_rasterHeight;
    area = width * height;
-
-   // unsigned int Raster[area] = {
-   //  0,
-   // };
    surface = new unsigned int[area];
    zBuffer = new std::vector<PIXEL *>[area];
 }
@@ -18,18 +14,11 @@ void RASTER::AddToZBuffer(unsigned int coord, PIXEL *pixel)
    (zBuffer + coord)->push_back(pixel);
 }
 
-void RASTER::ClearZBuffer()
-{
-   // delete zBuffer;
-}
-
 void RASTER::ClearRaster(unsigned int col)
 {
+   for (unsigned int i = 0; i < area; i++)
    {
-      for (unsigned int i = 0; i < area; i++)
-      {
-         *(surface + i) = col;
-      }
+      *(surface + i) = col;
    }
 }
 
@@ -37,24 +26,9 @@ void RASTER::EvaluateZ(CAMERA *camera)
 {
    for (unsigned int i = 0; i < area; i++)
    {
-      // TODO: Remove hard coded far plane Z.
       float tempZ = camera->GetFarPlane();
-      unsigned int col = 0x00000000;
-      //for (unsigned int j = 0; j < (*(zBuffer + i)).size(); j++)
-      //{
-      //   PIXEL* tempPix = (*(zBuffer + i))[j];
+      unsigned int col = 0xFF000000;
 
-      //   if (tempPix->z < tempZ)
-      //   {
-      //      col = tempPix->col;
-      //      tempZ = tempPix->z;
-      //      // TODO: Abstract memory management.
-      //      // delete tempPix;
-      //   }
-      //}
-
-      // if ((*(zBuffer + i)).size() > 0)
-      // {
       for (PIXEL *p : (*(zBuffer + i)))
       {
          if (p->z < tempZ)
@@ -64,7 +38,6 @@ void RASTER::EvaluateZ(CAMERA *camera)
          }
       }
       surface[i] = col;
-      // }
    }
 }
 

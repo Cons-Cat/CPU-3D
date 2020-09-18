@@ -12,7 +12,6 @@ void RasterUtil::DrawPixel(RASTER *_raster, unsigned int _x, unsigned int _y, fl
 {
    if (_x < _raster->GetWidth() && _y < _raster->GetHeight())
    {
-      // _raster->AddToZBuffer(ToOneDimension(_raster->GetWidth(), _x, _y), col);
       PIXEL *newPix = new PIXEL{_z, col};
       _raster->AddToZBuffer(ToOneDimension(_raster->GetWidth(), _x, _y), newPix);
    }
@@ -45,7 +44,7 @@ unsigned int RasterUtil::ColLerp(unsigned int col1, unsigned int col2, float R)
 #pragma endregion
 
 #pragma region Lines
-void RasterUtil::BresenhamAnyDir(RASTER *_raster, int x1, int y1, int x2, int y2, unsigned int col, unsigned int col2)
+void RasterUtil::BresenhamAnyDir(RASTER *_raster, int x1, int y1, int x2, int y2, unsigned int col, unsigned int col2, float z1, float z2)
 {
    int sx = (x1 < x2) ? 1 : -1;
    int sy = (y1 < y2) ? 1 : -1;
@@ -88,8 +87,17 @@ void RasterUtil::BresenhamAnyDir(RASTER *_raster, int x1, int y1, int x2, int y2
    {
       if (x1 >= 0 && y1 >= 0 && x1 < _raster->GetWidth() && y1 < _raster->GetHeight())
       {
-         // TODO: Proper z.
-         DrawPixel(_raster, x, y, 10, col);
+         float R;
+         if (x != x1 && y != y1)
+         {
+            R = sqrtf(abs((float)(x1 - x) / (float)(x2 - x1)) + abs((float)(y1 - y) / (float)(y2 - y1)));
+         }
+         else
+         {
+            R = 1;
+         }
+         // DrawPixel(_raster, x, y, Lerp(z1, z2, R), static_cast<unsigned int>((float)col * R));
+         DrawPixel(_raster, x, y, Lerp(z1, z2, R), col);
       }
 
       if (((x >= x2 && leftward == 0) || (x <= x2 && leftward == 1) || (x == x2 && leftward == 2)) && ((y >= y2 && upward == 0) || (y <= y2 && upward == 1) || (y == y2 && upward == 2)))
@@ -113,7 +121,7 @@ void RasterUtil::BresenhamAnyDir(RASTER *_raster, int x1, int y1, int x2, int y2
    }
 }
 
-void RasterUtil::ParametricAnyDir(RASTER *_raster, int x1, int y1, int x2, int y2, unsigned int col1, unsigned int col2)
+void RasterUtil::ParametricAnyDir(RASTER *_raster, int x1, int y1, int x2, int y2, unsigned int col1, unsigned int col2, float z1, float z2)
 {
    if (x1 == x2)
    {
@@ -121,7 +129,7 @@ void RasterUtil::ParametricAnyDir(RASTER *_raster, int x1, int y1, int x2, int y
       {
          float R = abs(i - y1) / (float)abs(y2 - y1);
          // TODO: Proper z.
-         DrawPixel(_raster, x1, i, 10, RasterUtil::ColLerp(col1, col2, R));
+         DrawPixel(_raster, x1, i, Lerp(z1,z2, R), RasterUtil::ColLerp(col1, col2, R));
       }
    }
    else
@@ -131,7 +139,7 @@ void RasterUtil::ParametricAnyDir(RASTER *_raster, int x1, int y1, int x2, int y
          float R = abs(i - x1) / (float)abs(x2 - x1);
          int y = Lerp(y1, y2, R);
          // TODO: Proper z.
-         DrawPixel(_raster, i, y, 10, RasterUtil::ColLerp(col1, col2, R));
+         DrawPixel(_raster, i, y, Lerp(z1,z2, R), RasterUtil::ColLerp(col1, col2, R));
       }
    }
    return;
