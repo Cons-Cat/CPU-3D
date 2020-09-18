@@ -204,7 +204,8 @@ void RasterUtil::DrawTriangle(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, RASTER *_raste
             float zA = barycentricA * a.z;
             float zB = barycentricB * b.z;
             float zC = barycentricC * c.z;
-            float zAvg = (barycentricA + barycentricB + barycentricC) / 3.0f;
+            // float zAvg = (barycentricA + barycentricB + barycentricC) / 3.0f;
+            float zAvg = zA + zB + zC;
 
             // v->col |= ((unsigned int)(ImplicitLine(*b, *c, *v) / ImplicitLine(*b, *c, *a) * (float)(255)) << 16);
             // v->col |= ((unsigned int)(ImplicitLine(*a, *c, *v) / ImplicitLine(*a, *c, *b) * (float)(255)) << 8);

@@ -1,26 +1,29 @@
 /* ---------------------- Includes ---------------------- */
+#include "fwd.h"
+
+#include <vector>
+#include "vecs.h"
 #include "RasterSurface.h"
 #include "RasterUtil.h"
 #include "geometry.h"
 #include "shaders.h"
-#include "vecs.h"
-#include <vector>
+#include "camera.h"
 
 /* ----------------------- Globals ---------------------- */
 #pragma region Globals
-const unsigned long rasterWidth = 800;
-const unsigned long rasterHeight = 400;
-RASTER *onlyRaster = new RASTER(&rasterWidth, &rasterHeight);
+const unsigned long rasterWidth = 400;
+const unsigned long rasterHeight = 200;
+RASTER* onlyRaster = new RASTER(&rasterWidth, &rasterHeight);
 float ZeroMatrix[4][4]{
     {0, 0, 0, 0},
     {0, 0, 0, 0},
     {0, 0, 0, 0},
-    {0, 0, 0, 0}};
+    {0, 0, 0, 0} };
 float IdentityMatrix[4][4]{
     {1, 0, 0, 0},
     {0, 1, 0, 0},
     {0, 0, 1, 0},
-    {0, 0, 0, 1}};
+    {0, 0, 0, 1} };
 #pragma endregion
 
 /*************
@@ -35,7 +38,7 @@ int main()
    VECTOR_3 gridVerts[44] = {
        VECTOR_3{0, 0, 0, 0, 0},
    };
-   std::vector<EDGE *> gridEdges;
+   std::vector<EDGE*> gridEdges;
    for (int i = 0; i < 11; i++)
    {
       // Left edge.
@@ -61,32 +64,32 @@ int main()
       gridVerts[i + 33].col = 0xFFFFFFFF;
       gridEdges.push_back(new EDGE(&gridVerts[i + 11], &gridVerts[i + 33]));
    }
-   MESH *gridMesh = new MESH(gridEdges, &IdentityMatrix[0][0]);
+   MESH* gridMesh = new MESH(gridEdges, &IdentityMatrix[0][0]);
    gridMesh->SetWorldMatrix(&IdentityMatrix[0][0]);
 #pragma endregion;
 
 /* ------------------- Initialize Cube ------------------ */
 #pragma region Cube
    VECTOR_3 cubeVerts[8];
-   std::vector<EDGE *> cubeEdges;
+   std::vector<EDGE*> cubeEdges;
    unsigned int red = 0xFFFF0000;
    unsigned int green = 0xFF00FF00;
    unsigned int blue = 0xFF0000FF;
    unsigned int yellow = 0xFFFFFF00;
    // Bottom verts.
-   cubeVerts[0] = VECTOR_3{-0.25, -0.25, -0.25, 1, green};
-   cubeVerts[1] = VECTOR_3{0.25, -0.25, -0.25, 1, green};
-   cubeVerts[2] = VECTOR_3{-0.25, -0.25, 0.25, 1, green};
-   cubeVerts[3] = VECTOR_3{0.25, -0.25, 0.25, 1, green};
+   cubeVerts[0] = VECTOR_3{ -0.25, -0.25, -0.25, 1, green };
+   cubeVerts[1] = VECTOR_3{ 0.25, -0.25, -0.25, 1, green };
+   cubeVerts[2] = VECTOR_3{ -0.25, -0.25, 0.25, 1, green };
+   cubeVerts[3] = VECTOR_3{ 0.25, -0.25, 0.25, 1, green };
    cubeEdges.push_back(new EDGE(&cubeVerts[0], &cubeVerts[1]));
    cubeEdges.push_back(new EDGE(&cubeVerts[0], &cubeVerts[2]));
    cubeEdges.push_back(new EDGE(&cubeVerts[3], &cubeVerts[1]));
    cubeEdges.push_back(new EDGE(&cubeVerts[3], &cubeVerts[2]));
    // Top verts.
-   cubeVerts[4] = VECTOR_3{-0.25, 0.25, -0.25, 1, green};
-   cubeVerts[5] = VECTOR_3{0.25, 0.25, -0.25, 1, green};
-   cubeVerts[6] = VECTOR_3{-0.25, 0.25, 0.25, 1, green};
-   cubeVerts[7] = VECTOR_3{0.25, 0.25, 0.25, 1, green};
+   cubeVerts[4] = VECTOR_3{ -0.25, 0.25, -0.25, 1, green };
+   cubeVerts[5] = VECTOR_3{ 0.25, 0.25, -0.25, 1, green };
+   cubeVerts[6] = VECTOR_3{ -0.25, 0.25, 0.25, 1, green };
+   cubeVerts[7] = VECTOR_3{ 0.25, 0.25, 0.25, 1, green };
    cubeEdges.push_back(new EDGE(&cubeVerts[4], &cubeVerts[5]));
    cubeEdges.push_back(new EDGE(&cubeVerts[4], &cubeVerts[6]));
    cubeEdges.push_back(new EDGE(&cubeVerts[7], &cubeVerts[5]));
@@ -97,7 +100,7 @@ int main()
    cubeEdges.push_back(new EDGE(&cubeVerts[2], &cubeVerts[6]));
    cubeEdges.push_back(new EDGE(&cubeVerts[3], &cubeVerts[7]));
    // Compose mesh.
-   MESH *cubeMesh = new MESH(cubeEdges, &IdentityMatrix[0][0]);
+   MESH* cubeMesh = new MESH(cubeEdges, &IdentityMatrix[0][0]);
    cubeMesh->GetWorldMatrix()->Translate(0, 0.25, 0);
    // Back quad.
    cubeMesh->TrisFromQuad(&cubeVerts[4], &cubeVerts[5], &cubeVerts[0], &cubeVerts[1], green);
@@ -117,7 +120,7 @@ int main()
 
 /* ------------------ Initialize Camera ----------------- */
 #pragma region Camera
-   CAMERA *camera = new CAMERA();
+   CAMERA* camera = new CAMERA();
    camera->SetViewMatrix(&IdentityMatrix[0][0]);
    camera->GetViewMatrix()->DRotate(0, -18);
    camera->GetViewMatrix()->Translate(0, 0.4, -1);
@@ -132,8 +135,9 @@ int main()
    {
       onlyRaster->ClearRaster(0xFF000000);
       cubeAngle += 0.165f;
+      // cubeAngle += 10.165f;
       // MESH *gridCopy = new MESH(*gridMesh);
-      MESH *cubeCopy = new MESH(*cubeMesh);
+      MESH* cubeCopy = new MESH(*cubeMesh);
       // cubeCopy->GetLocalMatrix()->DRotate(1, cubeAngle);
       // ShaderUtil::VS_ProjectEdges(*gridCopy, camera);
       ShaderUtil::VS_ProjectFaces(*cubeCopy, camera);
@@ -141,7 +145,8 @@ int main()
       cubeCopy->RenderFaces(onlyRaster);
       // delete gridCopy;
       delete cubeCopy;
-      onlyRaster->EvaluateZ();
+      onlyRaster->EvaluateZ(camera);
+      onlyRaster->CleanZ();
    } while (RS_Update(onlyRaster->GetSurface(), onlyRaster->GetArea()));
 
    RS_Shutdown();

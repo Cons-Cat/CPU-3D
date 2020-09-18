@@ -1,5 +1,4 @@
 #include "vecs.h"
-#include "RasterUtil.h"
 
 RASTER::RASTER(const unsigned long *_rasterWidth, const unsigned long *_rasterHeight)
 {
@@ -34,27 +33,50 @@ void RASTER::ClearRaster(unsigned int col)
    }
 }
 
-void RASTER::EvaluateZ()
+void RASTER::EvaluateZ(CAMERA *camera)
 {
    for (unsigned int i = 0; i < area; i++)
    {
-      // *(surface + i) = col;
       // TODO: Remove hard coded far plane Z.
-      float tempZ = 10.0f;
+      float tempZ = camera->GetFarPlane();
       unsigned int col = 0x00000000;
-      for (unsigned int j = 0; j < (*(zBuffer + i)).size(); j++)
-      {
-         PIXEL *tempPix = (*(zBuffer + i))[j];
+      //for (unsigned int j = 0; j < (*(zBuffer + i)).size(); j++)
+      //{
+      //   PIXEL* tempPix = (*(zBuffer + i))[j];
 
-         if (tempPix->z < tempZ)
+      //   if (tempPix->z < tempZ)
+      //   {
+      //      col = tempPix->col;
+      //      tempZ = tempPix->z;
+      //      // TODO: Abstract memory management.
+      //      // delete tempPix;
+      //   }
+      //}
+
+      // if ((*(zBuffer + i)).size() > 0)
+      // {
+      for (PIXEL *p : (*(zBuffer + i)))
+      {
+         if (p->z < tempZ)
          {
-            col = tempPix->col;
-            tempZ = tempPix->z;
-            // TODO: Abstract memory management.
-            // delete tempPix;
+            col = p->col;
+            tempZ = p->z;
          }
       }
       surface[i] = col;
+      // }
+   }
+}
+
+void RASTER::CleanZ()
+{
+   for (unsigned int i = 0; i < area; i++)
+   {
+      for (PIXEL *p : (*(zBuffer + i)))
+      {
+         delete p;
+      }
+      (zBuffer + i)->clear();
    }
 }
 

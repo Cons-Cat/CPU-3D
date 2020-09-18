@@ -1,0 +1,12 @@
+#pragma once
+class MATRIX;
+class PIXEL;
+class CAMERA;
+class ShaderUtil;
+class RasterUtil;
+class VECTOR_3;
+class VECTOR_2;
+class RASTER;
+class TRI;
+class EDGE;
+class MESH;
