@@ -17,7 +17,8 @@ public:
    static float ImplicitLine(VECTOR_2 a, VECTOR_2 b, VECTOR_2 p);
    // static VECTOR_2 FindBarycentric(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, VECTOR_2 p);
    static bool InTriangleTwo(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, VECTOR_2 p);
-   static void DrawTriangle(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, RASTER *_raster, unsigned int col);
+   static void DrawTriangleCol(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, RASTER *_raster, unsigned int col);
+   static void DrawTriangleTex(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, RASTER *_raster, const unsigned int* texture, unsigned int texWidth, unsigned int texHeight);
    static VECTOR_2 CoordToScreen(VECTOR_3 *v, RASTER *_raster);
    static void BresenhamAnyDir(RASTER *_raster, int x1, int y1, int x2, int y2, unsigned int col, unsigned int col2, float z1, float z2);
 };

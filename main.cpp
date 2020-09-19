@@ -5,6 +5,7 @@
 #include "RasterUtil.h"
 #include "camera.h"
 #include "geometry.h"
+#include "greendragon.h"
 #include "shaders.h"
 #include "vecs.h"
 #include <vector>
@@ -115,6 +116,7 @@ int main()
    // Top quad.
    cubeMesh->TrisFromQuad(&cubeVerts[4], &cubeVerts[5], &cubeVerts[6], &cubeVerts[7], yellow);
 
+   cubeMesh->SetTexture(&greendragon_pixels[0], greendragon_width, greendragon_height);
    float cubeAngle = 0.0f;
 #pragma endregion
 

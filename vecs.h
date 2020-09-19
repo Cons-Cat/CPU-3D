@@ -6,15 +6,13 @@
 
 struct VECTOR_2
 {
-   // NDC coords.
-   float x, y, z;
+   float x, y, z, u, v;
    unsigned int col;
 };
 
 struct VECTOR_3
 {
-   // NDC coords.
-   float x, y, z, w;
+   float x, y, z, w, u, v;
    unsigned int col;
 };
 

@@ -144,7 +144,7 @@ void RasterUtil::ParametricAnyDir(RASTER *_raster, int x1, int y1, int x2, int y
       {
          float R = abs(i - y1) / (float)abs(y2 - y1);
          // TODO: Proper z.
-         DrawPixel(_raster, x1, i, Lerp(z1,z2, R), RasterUtil::ColLerp(col1, col2, R));
+         DrawPixel(_raster, x1, i, Lerp(z1, z2, R), RasterUtil::ColLerp(col1, col2, R));
       }
    }
    else
@@ -154,7 +154,7 @@ void RasterUtil::ParametricAnyDir(RASTER *_raster, int x1, int y1, int x2, int y
          float R = abs(i - x1) / (float)abs(x2 - x1);
          int y = Lerp(y1, y2, R);
          // TODO: Proper z.
-         DrawPixel(_raster, i, y, Lerp(z1,z2, R), RasterUtil::ColLerp(col1, col2, R));
+         DrawPixel(_raster, i, y, Lerp(z1, z2, R), RasterUtil::ColLerp(col1, col2, R));
       }
    }
    return;
@@ -195,7 +195,7 @@ bool RasterUtil::InTriangleTwo(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, VECTOR_2 p)
    return barycentricA <= 1 && barycentricB <= 1 && barycentricC <= 1 && barycentricA >= 0 && barycentricB >= 0 && barycentricC >= 0;
 }
 
-void RasterUtil::DrawTriangle(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, RASTER *_raster, unsigned int col)
+void RasterUtil::DrawTriangleCol(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, RASTER *_raster, unsigned int col)
 {
    unsigned int minX = std::min(a.x, std::min(b.x, c.x));
    unsigned int maxX = std::max(a.x, std::max(b.x, c.x));
@@ -223,17 +223,68 @@ void RasterUtil::DrawTriangle(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, RASTER *_raste
             float barycentricB = subB / constraintB;
             float barycentricC = subC / constraintC;
 
-            // float z = Lerp(a.z, b.z, );
             float zA = barycentricA * a.z;
             float zB = barycentricB * b.z;
             float zC = barycentricC * c.z;
-            // float zAvg = (barycentricA + barycentricB + barycentricC) / 3.0f;
             float zAvg = zA + zB + zC;
 
-            // v->col |= ((unsigned int)(ImplicitLine(*b, *c, *v) / ImplicitLine(*b, *c, *a) * (float)(255)) << 16);
-            // v->col |= ((unsigned int)(ImplicitLine(*a, *c, *v) / ImplicitLine(*a, *c, *b) * (float)(255)) << 8);
-            // v->col |= ((unsigned int)(ImplicitLine(*a, *b, *v) / ImplicitLine(*a, *b, *c) * (float)(255)) << 0);
+            DrawPixel(_raster, i, j, zAvg, col);
+         }
+      }
+   }
+}
 
+void RasterUtil::DrawTriangleTex(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, RASTER *_raster, const unsigned int *texture, unsigned int texWidth, unsigned int texHeight)
+{
+   unsigned int minX = std::min(a.x, std::min(b.x, c.x));
+   unsigned int maxX = std::max(a.x, std::max(b.x, c.x));
+   unsigned int minY = std::min(a.y, std::min(b.y, c.y));
+   unsigned int maxY = std::max(a.y, std::max(b.y, c.y));
+
+   for (int i = minX; i <= maxX; i++)
+   {
+      for (int j = minY; j <= maxY; j++)
+      {
+         VECTOR_2 IJ{
+             i, j};
+         if (InTriangleTwo(a, b, c, IJ))
+         {
+            // TODO: Dry this up.
+            float constraintA = ImplicitLine(b, c, a);
+            float constraintB = ImplicitLine(a, c, b);
+            float constraintC = ImplicitLine(a, b, c);
+
+            float subA = ImplicitLine(b, c, IJ);
+            float subB = ImplicitLine(a, c, IJ);
+            float subC = ImplicitLine(a, b, IJ);
+
+            float barycentricA = subA / constraintA;
+            float barycentricB = subB / constraintB;
+            float barycentricC = subC / constraintC;
+
+            float zA = barycentricA * a.z;
+            float zB = barycentricB * b.z;
+            float zC = barycentricC * c.z;
+            float zAvg = zA + zB + zC;
+
+            float uA = RasterUtil::Lerp(0, a.u, barycentricA);
+            float vA = RasterUtil::Lerp(0, a.v, barycentricA);
+            float uB = RasterUtil::Lerp(0, b.u, barycentricB);
+            float vB = RasterUtil::Lerp(0, b.v, barycentricB);
+            float uC = RasterUtil::Lerp(0, c.u, barycentricC);
+            float vC = RasterUtil::Lerp(0, c.v, barycentricC);
+
+            unsigned int xA = uA * texWidth;
+            unsigned int yA = vA * texHeight;
+            unsigned int xB = uB * texWidth;
+            unsigned int yB = vB * texHeight;
+            unsigned int xC = uC * texWidth;
+            unsigned int yC = vC * texHeight;
+
+            unsigned int texX = xA + xB + xC;
+            unsigned int texY = yA + yB + yC;
+
+            unsigned int col = *(texture + ToOneDimension(texWidth, texX, texY));
             DrawPixel(_raster, i, j, zAvg, col);
          }
       }
