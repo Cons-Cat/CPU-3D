@@ -41,6 +41,21 @@ unsigned int RasterUtil::ColLerp(unsigned int col1, unsigned int col2, float R)
    returnCol |= 0xFF000000;
    return returnCol;
 }
+
+unsigned int RasterUtil::rgbaTOargb(unsigned int colIn)
+{
+   unsigned int blue = (colIn & 0xFF000000) >> (24);
+   unsigned int green = (colIn & 0x00FF0000) >> (8);
+   unsigned int red = (colIn & 0x0000FF00) << (8);
+   unsigned int alpha = (colIn & 0x000000FF) << (24);
+
+   unsigned int colOut = 0;
+   colOut |= blue;
+   colOut |= green;
+   colOut |= red;
+   colOut |= alpha;
+   return colOut;
+}
 #pragma endregion
 
 #pragma region Lines
