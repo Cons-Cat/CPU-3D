@@ -6,7 +6,7 @@ CAMERA::CAMERA()
        {1, 0, 0, 0},
        {0, 1, 0, 0},
        {0, 0, 1, 0},
-       {0, 0, 0, 1} };
+       {0, 0, 0, 1}};
    viewMatrix = new MATRIX(&IdentityMatrix[0][0]);
    projMatrix = new MATRIX(&IdentityMatrix[0][0]);
 }
@@ -27,12 +27,12 @@ void CAMERA::SetFOV(float degrees)
    vFOV = degrees;
 }
 
-void CAMERA::SetViewMatrix(float* position)
+void CAMERA::SetViewMatrix(float *position)
 {
    viewMatrix = new MATRIX(position);
 }
 
-MATRIX* CAMERA::GetViewMatrix()
+MATRIX *CAMERA::GetViewMatrix()
 {
    return viewMatrix;
 }
@@ -49,11 +49,11 @@ void CAMERA::SetProjMatrix(float zNear, float zFar)
        {yScale * aspectRatio, 0, 0, 0},
        {0, yScale, 0, 0},
        {0, 0, zFar / (zFar - zNear), 1},
-       {0, 0, -(zFar * zNear) / (zFar - zNear), 0} };
+       {0, 0, -(zFar * zNear) / (zFar - zNear), 0}};
    projMatrix->Pos(&projMat[0][0]);
 }
 
-MATRIX* CAMERA::GetProjMatrix()
+MATRIX *CAMERA::GetProjMatrix()
 {
    return projMatrix;
 }
@@ -61,7 +61,7 @@ MATRIX* CAMERA::GetProjMatrix()
 void CAMERA::Invert()
 {
    VECTOR_3 tempVert{
-       *(viewMatrix->GetMatrix() + 12), *(viewMatrix->GetMatrix() + 13), *(viewMatrix->GetMatrix() + 14) };
+       *(viewMatrix->GetMatrix() + 12), *(viewMatrix->GetMatrix() + 13), *(viewMatrix->GetMatrix() + 14)};
    float subMatrix[3][3]{
        {*(viewMatrix->GetMatrix() + 0), *(viewMatrix->GetMatrix() + 1), *(viewMatrix->GetMatrix() + 2)},
        {*(viewMatrix->GetMatrix() + 4), *(viewMatrix->GetMatrix() + 5), *(viewMatrix->GetMatrix() + 6)},
@@ -72,7 +72,7 @@ void CAMERA::Invert()
        {1, 0, 0, 0},
        {0, 1, 0, 0},
        {0, 0, 1, 0},
-       {0, 0, 0, 1} };
+       {0, 0, 0, 1}};
    for (int j = 0; j < 3; j++)
    {
       for (int i = 0; i < 3; i++)
@@ -80,7 +80,7 @@ void CAMERA::Invert()
          transMatrix[i][j] = subMatrix[j][i];
       }
    }
-   MATRIX* tempMatrix = new MATRIX(&transMatrix[0][0]);
+   MATRIX *tempMatrix = new MATRIX(&transMatrix[0][0]);
    ShaderUtil::MultVertByMatrix(&tempVert, tempMatrix);
    // Negate the vector.
    tempVert.x = -tempVert.x;

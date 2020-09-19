@@ -22,13 +22,18 @@ unsigned int RasterUtil::Lerp(float A, float B, float R)
    return (B - A) * R + A;
 }
 
+float RasterUtil::LerpF(float A, float B, float R)
+{
+   return (B - A) * R + A;
+}
+
 VECTOR_2 RasterUtil::CoordToScreen(VECTOR_3 *v, RASTER *_raster)
 {
-   VECTOR_3 tempV{v->x / v->w, v->y / v->w, v->z / v->w, 1, v->col};
+   VECTOR_3 tempV{v->x / v->w, v->y / v->w, v->z / v->w, 1, v->u, v->v, v->col};
    return VECTOR_2{
        (tempV.x + 1.0f) / 2.0f * (_raster->GetWidth()),
        (1.0f - tempV.y) / 2.0f * (_raster->GetHeight()),
-       tempV.z,
+       tempV.z, tempV.u, tempV.v,
        v->col};
 }
 
@@ -267,24 +272,17 @@ void RasterUtil::DrawTriangleTex(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, RASTER *_ra
             float zC = barycentricC * c.z;
             float zAvg = zA + zB + zC;
 
-            float uA = RasterUtil::Lerp(0, a.u, barycentricA);
-            float vA = RasterUtil::Lerp(0, a.v, barycentricA);
-            float uB = RasterUtil::Lerp(0, b.u, barycentricB);
-            float vB = RasterUtil::Lerp(0, b.v, barycentricB);
-            float uC = RasterUtil::Lerp(0, c.u, barycentricC);
-            float vC = RasterUtil::Lerp(0, c.v, barycentricC);
+            float uA = RasterUtil::LerpF(0, a.u, barycentricA);
+            float vA = RasterUtil::LerpF(0, a.v, barycentricA);
+            float uB = RasterUtil::LerpF(0, b.u, barycentricB);
+            float vB = RasterUtil::LerpF(0, b.v, barycentricB);
+            float uC = RasterUtil::LerpF(0, c.u, barycentricC);
+            float vC = RasterUtil::LerpF(0, c.v, barycentricC);
 
-            unsigned int xA = uA * texWidth;
-            unsigned int yA = vA * texHeight;
-            unsigned int xB = uB * texWidth;
-            unsigned int yB = vB * texHeight;
-            unsigned int xC = uC * texWidth;
-            unsigned int yC = vC * texHeight;
+            unsigned int texX = (uA + uB + uC) * texWidth;
+            unsigned int texY = (vA + vB + vC) * texHeight;
 
-            unsigned int texX = xA + xB + xC;
-            unsigned int texY = yA + yB + yC;
-
-            unsigned int col = *(texture + ToOneDimension(texWidth, texX, texY));
+            unsigned int col = rgbaTOargb(*(texture + ToOneDimension(texWidth, texX, texY)));
             DrawPixel(_raster, i, j, zAvg, col);
          }
       }

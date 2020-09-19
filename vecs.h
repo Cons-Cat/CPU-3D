@@ -1,8 +1,8 @@
 #pragma once
 #include "fwd.h"
 
-#include <vector>
 #include "camera.h"
+#include <vector>
 
 struct VECTOR_2
 {
@@ -24,20 +24,20 @@ struct PIXEL
 
 class RASTER
 {
-   public:
-   RASTER(const unsigned long* _rasterWidth, const unsigned long* _rasterHeight);
-   void AddToZBuffer(unsigned int coord, PIXEL* pixel);
+public:
+   RASTER(const unsigned long *_rasterWidth, const unsigned long *_rasterHeight);
+   void AddToZBuffer(unsigned int coord, PIXEL *pixel);
    void ClearRaster(unsigned int col);
-   void EvaluateZ(CAMERA* camera);
+   void EvaluateZ(CAMERA *camera);
    void CleanZ();
-   unsigned int* GetSurface();
+   unsigned int *GetSurface();
    unsigned int GetWidth();
    unsigned int GetHeight();
    unsigned int GetArea();
 
-   private:
-   unsigned int* surface;
-   std::vector<PIXEL*>* zBuffer;
+private:
+   unsigned int *surface;
+   std::vector<PIXEL *> *zBuffer;
    unsigned long width;
    unsigned long height;
    unsigned long area;

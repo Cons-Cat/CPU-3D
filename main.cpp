@@ -69,7 +69,7 @@ int main()
    gridMesh->SetWorldMatrix(&IdentityMatrix[0][0]);
 #pragma endregion;
 
-/* ------------------- Initialize Cube ------------------ */
+   /* ------------------- Initialize Cube ------------------ */
 #pragma region Cube
    VECTOR_3 cubeVerts[8];
    std::vector<EDGE *> cubeEdges;
@@ -78,19 +78,19 @@ int main()
    unsigned int blue = 0xFF0000FF;
    unsigned int yellow = 0xFFFFFF00;
    // Bottom verts.
-   cubeVerts[0] = VECTOR_3{-0.25, -0.25, -0.25, 1, green};
-   cubeVerts[1] = VECTOR_3{0.25, -0.25, -0.25, 1, green};
-   cubeVerts[2] = VECTOR_3{-0.25, -0.25, 0.25, 1, green};
-   cubeVerts[3] = VECTOR_3{0.25, -0.25, 0.25, 1, green};
+   cubeVerts[0] = VECTOR_3{-0.25, -0.25, -0.25, 1, 0.0f, 1.0f, green};
+   cubeVerts[1] = VECTOR_3{0.25, -0.25, -0.25, 1, 1.0f, 1.0f, green};
+   cubeVerts[2] = VECTOR_3{-0.25, -0.25, 0.25, 1, 1.0f, 1.0f, green};
+   cubeVerts[3] = VECTOR_3{0.25, -0.25, 0.25, 1, 0.0f, 1.0f, green};
    cubeEdges.push_back(new EDGE(&cubeVerts[0], &cubeVerts[1]));
    cubeEdges.push_back(new EDGE(&cubeVerts[0], &cubeVerts[2]));
    cubeEdges.push_back(new EDGE(&cubeVerts[3], &cubeVerts[1]));
    cubeEdges.push_back(new EDGE(&cubeVerts[3], &cubeVerts[2]));
    // Top verts.
-   cubeVerts[4] = VECTOR_3{-0.25, 0.25, -0.25, 1, green};
-   cubeVerts[5] = VECTOR_3{0.25, 0.25, -0.25, 1, green};
-   cubeVerts[6] = VECTOR_3{-0.25, 0.25, 0.25, 1, green};
-   cubeVerts[7] = VECTOR_3{0.25, 0.25, 0.25, 1, green};
+   cubeVerts[4] = VECTOR_3{-0.25, 0.25, -0.25, 1, 0.0f, 0.0f, green};
+   cubeVerts[5] = VECTOR_3{0.25, 0.25, -0.25, 1, 1.0f, 0.0f, green};
+   cubeVerts[6] = VECTOR_3{-0.25, 0.25, 0.25, 1, 1.0f, 0.0f, green};
+   cubeVerts[7] = VECTOR_3{0.25, 0.25, 0.25, 1, 0.0f, 0.0f, green};
    cubeEdges.push_back(new EDGE(&cubeVerts[4], &cubeVerts[5]));
    cubeEdges.push_back(new EDGE(&cubeVerts[4], &cubeVerts[6]));
    cubeEdges.push_back(new EDGE(&cubeVerts[7], &cubeVerts[5]));
@@ -100,6 +100,7 @@ int main()
    cubeEdges.push_back(new EDGE(&cubeVerts[1], &cubeVerts[5]));
    cubeEdges.push_back(new EDGE(&cubeVerts[2], &cubeVerts[6]));
    cubeEdges.push_back(new EDGE(&cubeVerts[3], &cubeVerts[7]));
+
    // Compose mesh.
    MESH *cubeMesh = new MESH(cubeEdges, &IdentityMatrix[0][0]);
    cubeMesh->GetWorldMatrix()->Translate(0, 0.25, 0);

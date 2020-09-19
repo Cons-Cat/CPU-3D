@@ -11,6 +11,7 @@ public:
    static unsigned int ToOneDimension(unsigned int _width, unsigned int _x, unsigned int _y);
    static void DrawPixel(RASTER *_raster, unsigned int _x, unsigned int _y, float _z, unsigned int col);
    static unsigned int Lerp(float A, float B, float R);
+   static float LerpF(float A, float B, float R);
    static unsigned int ColLerp(unsigned int col1, unsigned int col2, float R);
    static unsigned int rgbaTOargb(unsigned int colIn);
    static void ParametricAnyDir(RASTER *_raster, int x1, int y1, int x2, int y2, unsigned int col1, unsigned int col2, float z1, float z2);
