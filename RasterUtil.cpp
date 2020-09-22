@@ -10,7 +10,7 @@ unsigned int RasterUtil::ToOneDimension(unsigned int _width, unsigned int _x, un
 
 void RasterUtil::DrawPixel(RASTER *_raster, unsigned int _x, unsigned int _y, float _z, unsigned int col)
 {
-   if (_x < _raster->GetWidth() && _y < _raster->GetHeight())
+   if (_x > 0 && _x < _raster->GetWidth() && _y > 0 && _y < _raster->GetHeight())
    {
       PIXEL *newPix = new PIXEL{_z, col};
       _raster->AddToZBuffer(ToOneDimension(_raster->GetWidth(), _x, _y), newPix);
@@ -33,7 +33,10 @@ VECTOR_2 RasterUtil::CoordToScreen(VECTOR_3 *v, RASTER *_raster)
    return VECTOR_2{
        (tempV.x + 1.0f) / 2.0f * (_raster->GetWidth()),
        (1.0f - tempV.y) / 2.0f * (_raster->GetHeight()),
-       tempV.z, tempV.u, tempV.v,
+       tempV.z,
+       tempV.u,
+       tempV.v,
+       tempV.w,
        v->col};
 }
 
@@ -272,12 +275,17 @@ void RasterUtil::DrawTriangleTex(VECTOR_2 a, VECTOR_2 b, VECTOR_2 c, RASTER *_ra
             float zC = barycentricC * c.z;
             float zAvg = zA + zB + zC;
 
-            float uA = RasterUtil::LerpF(0, a.u, barycentricA);
-            float vA = RasterUtil::LerpF(0, a.v, barycentricA);
-            float uB = RasterUtil::LerpF(0, b.u, barycentricB);
-            float vB = RasterUtil::LerpF(0, b.v, barycentricB);
-            float uC = RasterUtil::LerpF(0, c.u, barycentricC);
-            float vC = RasterUtil::LerpF(0, c.v, barycentricC);
+            float invZA = RasterUtil::LerpF(0, 1.0f / a.w, barycentricA);
+            float invZB = RasterUtil::LerpF(0, 1.0f / b.w, barycentricB);
+            float invZC = RasterUtil::LerpF(0, 1.0f / c.w, barycentricC);
+            float invZAvg = invZA + invZB + invZC;
+
+            float uA = RasterUtil::LerpF(0, a.u / a.w, barycentricA) / invZAvg;
+            float vA = RasterUtil::LerpF(0, a.v / a.w, barycentricA) / invZAvg;
+            float uB = RasterUtil::LerpF(0, b.u / b.w, barycentricB) / invZAvg;
+            float vB = RasterUtil::LerpF(0, b.v / b.w, barycentricB) / invZAvg;
+            float uC = RasterUtil::LerpF(0, c.u / c.w, barycentricC) / invZAvg;
+            float vC = RasterUtil::LerpF(0, c.v / c.w, barycentricC) / invZAvg;
 
             unsigned int texX = (uA + uB + uC) * texWidth;
             unsigned int texY = (vA + vB + vC) * texHeight;

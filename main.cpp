@@ -8,7 +8,9 @@
 #include "greendragon.h"
 #include "shaders.h"
 #include "vecs.h"
+#include <iostream>
 #include <vector>
+#include <windows.h>
 
 /* ----------------------- Globals ---------------------- */
 #pragma region Globals
@@ -136,6 +138,27 @@ int main()
    /* ---------------------- Core Loop --------------------- */
    do
    {
+      if (GetAsyncKeyState(VK_UP))
+      {
+         camera->GetViewMatrix()->Translate(0, 0, -0.12f);
+      }
+      else if (GetAsyncKeyState(VK_DOWN))
+      {
+         camera->GetViewMatrix()->Translate(0, 0, 0.12f);
+      }
+      else if (GetAsyncKeyState(VK_LEFT))
+      {
+         camera->GetViewMatrix()->Translate(0.12f, 0, 0);
+      }
+      else if (GetAsyncKeyState(VK_RIGHT))
+      {
+         camera->GetViewMatrix()->Translate(-0.12f, 0, 0);
+      }
+      else
+      {
+         camera->GetViewMatrix()->Translate(0, 0, 0);
+      }
+
       onlyRaster->CleanZ();
       onlyRaster->ClearRaster(0xFF000000);
       // cubeAngle += 0.165f;

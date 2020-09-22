@@ -6,7 +6,7 @@
 
 struct VECTOR_2
 {
-   float x, y, z, u, v;
+   float x, y, z, u, v, w;
    unsigned int col;
 };
 
