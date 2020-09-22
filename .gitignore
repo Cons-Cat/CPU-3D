@@ -20,6 +20,8 @@
 
 /main.cpp
 main.cpp
+RasterSurface.cpp
+RasterSurface.h
 *.jpg
 main.cpp
 *.json
