@@ -4,8 +4,6 @@
 *.db-shm
 *.db-wal
 *.opendb
-*.vcxproj
-*.sln
 *.filters
 *.user
 *.exe
@@ -18,13 +16,8 @@
 *.idb
 *.obj
 
-/main.cpp
-main.cpp
-RasterSurface.cpp
-RasterSurface.h
 *.jpg
-main.cpp
 *.json
 *.sarif
 *.xml
-.vs/src/v16/.suo
+.vs/
